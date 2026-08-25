@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Daily training brief.
 
-    python scripts/daily_brief.py [--fixture PATH] [--readiness KEY=VAL ...]
+    python scripts/daily_brief.py [--fixture PATH] [--refresh] [--readiness KEY=VAL ...]
 
 Runs the audit over the recent window, assesses readiness, and prints one
-suggested session with its reasoning.
+suggested session with its reasoning. --refresh fetches a live window from
+Strava (STRAVA_CLIENT_ID/SECRET/REFRESH_TOKEN in the environment) and falls
+back to the committed fixture when credentials are absent or the fetch fails.
 """
 
 import argparse
 import json
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,8 +22,11 @@ from coach.audit import audit                    # noqa: E402
 from coach.readiness import assess               # noqa: E402
 from coach.recommend import recommend            # noqa: E402
 from coach.registry import Registry              # noqa: E402
+from coach.sources import strava                 # noqa: E402
 
 RULE = "=" * 72
+WINDOW_DAYS = 28
+PRIVATE_WINDOW = ROOT / "data" / "private" / "window_28d.json"
 
 
 def _parse_kv(pairs):
@@ -34,17 +40,49 @@ def _parse_kv(pairs):
     return out
 
 
+def _refresh_window(rider):
+    """Fetch a live window into data/private/. Returns it, or None to signal
+    the caller to fall back to the committed fixture (reason on stderr)."""
+    try:
+        client = strava.StravaClient.from_env()
+    except strava.MissingCredentials as e:
+        print(f"[refresh] {e}; using fixture", file=sys.stderr)
+        return None
+    end = date.today()
+    start = end - timedelta(days=WINDOW_DAYS)
+    try:
+        window = strava.fetch_window(client, rider.get("strava_athlete_id"),
+                                     start, end, rider.get("ftp"))
+    except Exception as e:  # the brief must still print on any fetch failure
+        print(f"[refresh] fetch failed ({e}); using fixture", file=sys.stderr)
+        return None
+    if not window["rides"]:
+        print("[refresh] no rides with power in the window; using fixture",
+              file=sys.stderr)
+        return None
+    PRIVATE_WINDOW.parent.mkdir(parents=True, exist_ok=True)
+    PRIVATE_WINDOW.write_text(json.dumps(window))
+    print(f"[refresh] wrote {len(window['rides'])} rides to {PRIVATE_WINDOW}",
+          file=sys.stderr)
+    return window
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fixture", default=str(ROOT / "data" / "fixtures" / "window_28d.json"))
     ap.add_argument("--profile", default=str(ROOT / "data" / "rider.json"))
+    ap.add_argument("--refresh", action="store_true",
+                    help="fetch a live window from Strava into data/private/ "
+                         "(falls back to --fixture without credentials)")
     ap.add_argument("--readiness", action="append")
     ap.add_argument("--goal", default="raise_ftp")
     ap.add_argument("--json", action="store_true", help="emit JSON instead of text")
     args = ap.parse_args()
 
-    window = json.loads(Path(args.fixture).read_text())
     rider = json.loads(Path(args.profile).read_text())
+    window = _refresh_window(rider) if args.refresh else None
+    if window is None:
+        window = json.loads(Path(args.fixture).read_text())
     ftp = rider.get("ftp", window.get("ftp"))
 
     a = audit(window, ftp,

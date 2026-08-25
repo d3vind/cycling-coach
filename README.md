@@ -11,10 +11,11 @@ phrase the output or vary the workout, but only inside these bounds.
 
 ## Status
 
-Early. The analysis layer works and is tested. The two data adapters
-(sources/strava.py, sources/google_health.py) are documented interfaces, not
-implementations -- the fixture in data/fixtures/ is a real 28-day window to
-develop against.
+Early. The analysis layer works and is tested. sources/strava.py is
+implemented (OAuth2 refresh-token flow, credentials from the environment);
+sources/google_health.py remains a documented interface. The fixture in
+data/fixtures/ is a real 28-day window to develop against without
+credentials.
 
 Every threshold in the registry has been validated against exactly one athlete.
 They are conventions, not findings. Do not ship them as defaults without
@@ -30,6 +31,11 @@ calibrating against a real population.
       --readiness sleep_hours=7.5 \
       --readiness resting_hr_delta_bpm=2 \
       --readiness subjective_1_10=8
+
+Add --refresh to fetch a live 28-day window from Strava into data/private/
+(gitignored). It needs STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET and
+STRAVA_REFRESH_TOKEN in the environment, and falls back to the committed
+fixture when they are absent or the fetch fails.
 
 Output:
 
@@ -59,7 +65,7 @@ Output:
     src/coach/readiness.py              health signals -> green/amber/red
     src/coach/registry.py               eligibility + the post-generation rules layer
     src/coach/recommend.py              daily decision
-    src/coach/sources/                  Strava and Google Health adapters (interfaces)
+    src/coach/sources/                  Strava adapter; Google Health interface
     scripts/daily_brief.py              CLI
 
 methods.json and the registry markdown share IDs. The split is deliberate: the
