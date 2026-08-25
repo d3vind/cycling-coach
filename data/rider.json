@@ -1,0 +1,18 @@
+{
+  "name": "devin",
+  "ftp": 255,
+  "ftp_anchor_age_weeks": 3,
+  "weight_kg": 74.8,
+  "base_weeks": 20,
+  "training_history_weeks": 200,
+  "first_season": false,
+  "first_structured_session": false,
+  "illness_flag": false,
+  "indoor_only": false,
+  "indoor_cap_min": 60,
+  "longest_recent_ride_min": 138,
+  "fuelling_plan_confirmed": true,
+  "stated_weekly_hours": 9,
+  "planned_weekly_hours": 9,
+  "goal": "raise_ftp"
+}

@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "registry_version": "0.2",
+  "updated": "2026-08-25",
+  "note": "Machine layer for TRAINING_METHODS_REGISTRY.md. Evidence and rationale live in the markdown; this file holds only what the generator needs to construct and validate a session. Keep ids in sync.",
+
+  "zone_model": {
+    "anchor": "ftp",
+    "zones": {
+      "recovery":   { "lo_pct": 0.00, "hi_pct": 0.55 },
+      "endurance":  { "lo_pct": 0.56, "hi_pct": 0.75 },
+      "tempo":      { "lo_pct": 0.76, "hi_pct": 0.87 },
+      "sweetspot":  { "lo_pct": 0.84, "hi_pct": 0.94 },
+      "threshold":  { "lo_pct": 0.94, "hi_pct": 1.05 },
+      "vo2max":     { "lo_pct": 1.06, "hi_pct": 1.28 },
+      "anaerobic":  { "lo_pct": 1.29, "hi_pct": 1.80 }
+    }
+  },
+
+  "methods": [
+    {
+      "id": "endurance_z2",
+      "name": "Low-intensity endurance",
+      "category": "aerobic_base",
+      "grade": "A",
+      "structure": { "type": "continuous", "zone": "endurance", "duration_min": [60, 300] },
+      "prerequisites": {},
+      "contraindications": [],
+      "max_per_week": 7,
+      "readiness_min": "amber"
+    },
+    {
+      "id": "vo2_short_short_30_15",
+      "name": "Ronnestad 30/15",
+      "category": "vo2max",
+      "grade": "A",
+      "priority": 1,
+      "structure": {
+        "type": "intervals",
+        "sets": 3,
+        "reps_per_set": 13,
+        "work_s": 30,
+        "work_pct": [1.18, 1.28],
+        "rest_s": 15,
+        "rest_pct": [0.55, 0.60],
+        "between_sets_s": 180,
+        "total_duration_min": 60
+      },
+      "prerequisites": {
+        "min_base_weeks": 6,
+        "requires_ftp_anchor": true,
+        "ftp_anchor_max_age_weeks": 8,
+        "erg_preferred": true
+      },
+      "contraindications": ["red_readiness", "first_structured_session", "illness_flag"],
+      "max_per_week": 2,
+      "max_per_week_in_block": 5,
+      "readiness_min": "green"
+    },
+    {
+      "id": "vo2_short_short_40_20",
+      "name": "40/20 intervals",
+      "category": "vo2max",
+      "grade": "B",
+      "structure": {
+        "type": "intervals",
+        "sets": 3,
+        "reps_per_set": 8,
+        "work_s": 40,
+        "work_pct": [1.18, 1.25],
+        "rest_s": 20,
+        "rest_pct": [0.55, 0.60],
+        "between_sets_s": 210,
+        "total_duration_min": 60
+      },
+      "prerequisites": { "min_base_weeks": 6, "requires_ftp_anchor": true, "ftp_anchor_max_age_weeks": 8 },
+      "contraindications": ["red_readiness", "first_structured_session", "illness_flag"],
+      "max_per_week": 2,
+      "readiness_min": "green"
+    },
+    {
+      "id": "vo2_long_intervals",
+      "name": "Long VO2max intervals",
+      "category": "vo2max",
+      "grade": "A",
+      "structure": {
+        "type": "intervals",
+        "sets": 1,
+        "reps_per_set": [4, 5],
+        "work_s": [240, 300],
+        "work_pct": [1.05, 1.20],
+        "rest_s": [240, 300],
+        "rest_pct": [0.50, 0.60],
+        "total_duration_min": 60
+      },
+      "prerequisites": { "min_base_weeks": 6, "requires_ftp_anchor": true, "ftp_anchor_max_age_weeks": 8 },
+      "contraindications": ["red_readiness", "first_structured_session"],
+      "max_per_week": 2,
+      "readiness_min": "green"
+    },
+    {
+      "id": "threshold_2x20",
+      "name": "Threshold intervals",
+      "category": "threshold",
+      "grade": "B",
+      "structure": {
+        "type": "intervals",
+        "reps": 2,
+        "work_s": 1200,
+        "work_pct": [0.94, 1.05],
+        "rest_s": [300, 600],
+        "rest_pct": [0.45, 0.55],
+        "total_duration_min": 60,
+        "progression": ["3x15", "2x20", "2x25", "3x20"]
+      },
+      "prerequisites": { "min_base_weeks": 4, "requires_ftp_anchor": true, "ftp_anchor_max_age_weeks": 8 },
+      "contraindications": ["red_readiness"],
+      "max_per_week": 2,
+      "readiness_min": "green"
+    },
+    {
+      "id": "sweetspot_intervals",
+      "name": "Sweet spot",
+      "category": "sub_threshold",
+      "grade": "B",
+      "structure": {
+        "type": "intervals",
+        "reps": [3, 4],
+        "work_s": [720, 900],
+        "work_pct": [0.84, 0.94],
+        "rest_s": [240, 300],
+        "rest_pct": [0.45, 0.55],
+        "total_duration_min": 60
+      },
+      "prerequisites": { "min_base_weeks": 3, "requires_ftp_anchor": true, "ftp_anchor_max_age_weeks": 8 },
+      "contraindications": ["red_readiness"],
+      "max_per_week": 2,
+      "pairing_rule": "must_pair_with_vo2max_session_same_week",
+      "readiness_min": "amber"
+    },
+    {
+      "id": "over_unders",
+      "name": "Over-unders",
+      "category": "threshold",
+      "grade": "C",
+      "structure": {
+        "type": "alternating",
+        "reps": 3,
+        "block_duration_s": [540, 720],
+        "under_s": 120, "under_pct": [0.95, 1.00],
+        "over_s": 60, "over_pct": [1.05, 1.10],
+        "rest_s": 300,
+        "total_duration_min": 60
+      },
+      "prerequisites": { "min_base_weeks": 8, "requires_ftp_anchor": true, "completed_method": "threshold_2x20" },
+      "contraindications": ["red_readiness"],
+      "max_per_week": 1,
+      "readiness_min": "green"
+    },
+    {
+      "id": "durability_long_ride",
+      "name": "Long ride with late efforts",
+      "category": "fatigue_resistance",
+      "grade": "B",
+      "structure": {
+        "type": "continuous_with_efforts",
+        "base_zone": "endurance",
+        "duration_min": [150, 300],
+        "efforts": { "count": [2, 4], "duration_s": [480, 900], "pct": [0.84, 0.94] },
+        "effort_placement": "final_third",
+        "min_kj_per_kg_before_efforts": 25
+      },
+      "prerequisites": { "longest_recent_ride_pct_of_target": 0.7, "fuelling_plan_confirmed": true },
+      "contraindications": ["red_readiness", "indoor_session_cap_under_150min"],
+      "max_per_week": 1,
+      "readiness_min": "green"
+    },
+    {
+      "id": "block_periodization_vo2",
+      "name": "Front-loaded VO2 block",
+      "category": "periodization_structure",
+      "grade": "C",
+      "contested": true,
+      "structure": {
+        "type": "multi_week",
+        "week_1": { "vo2_sessions": 5, "days": "mon-fri", "weekend": "easy" },
+        "weeks_2_4": { "vo2_sessions": 1, "sub_threshold_sessions": 2, "fill": "endurance_z2" },
+        "followed_by": "recovery_week"
+      },
+      "prerequisites": { "min_training_history_weeks": 12, "readiness_green_days_last_14": 10 },
+      "contraindications": ["red_readiness", "first_season_user"],
+      "abort_rule": "any_amber_or_red_during_week_1_aborts_block",
+      "default": false
+    },
+    {
+      "id": "strength_maximal",
+      "name": "Heavy resistance training",
+      "category": "supporting",
+      "grade": "B",
+      "structure": {
+        "type": "resistance",
+        "sessions_per_week": 2,
+        "duration_min": [30, 40],
+        "sets": [3, 4],
+        "reps": [4, 8],
+        "load": "heavy"
+      },
+      "scheduling_rule": "same_day_as_hard_ride",
+      "prerequisites": {},
+      "contraindications": ["red_readiness"],
+      "readiness_min": "amber"
+    },
+    {
+      "id": "taper",
+      "name": "Pre-event taper",
+      "category": "periodization_structure",
+      "grade": "A",
+      "structure": {
+        "type": "multi_day",
+        "duration_days": [5, 10],
+        "volume_reduction_pct": [0.30, 0.50],
+        "intensity": "maintained",
+        "day_before": { "duration_min": 30, "openers": { "reps": 3, "duration_s": 60, "pct": [0.95, 1.05] } }
+      },
+      "trigger": "a_priority_event_scheduled",
+      "overrides_weekly_template": true
+    },
+    {
+      "id": "recovery_spin",
+      "name": "Active recovery",
+      "category": "recovery",
+      "grade": "C",
+      "structure": { "type": "continuous", "zone": "recovery", "duration_min": [30, 45] },
+      "prerequisites": {},
+      "contraindications": [],
+      "readiness_min": "red"
+    }
+  ],
+
+  "distribution_models": {
+    "polarized":  { "low": 0.80, "moderate": 0.03, "high": 0.17, "min_weekly_hours": 12, "grade": "A" },
+    "pyramidal":  { "low": 0.75, "moderate": 0.15, "high": 0.10, "min_weekly_hours": 6,  "grade": "A", "default": true },
+    "threshold":  { "low": 0.60, "moderate": 0.30, "high": 0.10, "max_weekly_hours": 5,  "grade": "B", "max_block_weeks": 6 }
+  },
+
+  "analysis_basis": {
+    "note": "v0.2 fix. Intensity distribution MUST be computed over pedalling time. Counting zero-watt coasting as low-intensity inflates the low bucket outdoors and makes gray-zone patterns invisible. Validation case read 29.4% moderate on elapsed time vs 35.8% on pedalling time.",
+    "time_basis": "pedalling_time",
+    "exclude_zero_watt_samples": true,
+    "report_coasting_separately": true,
+    "max_sample_gap_s": 120,
+    "segment_by": ["indoor_outdoor", "structured_unstructured"],
+    "aggregate_alone_is_insufficient": true
+  },
+
+  "session_classification": {
+    "note": "v0.2. Classify from measured duration x %FTP. NEVER from the file name or the source platform's category. Platform labels are retained as display metadata only. Validation case: a file in a block labelled VO2max contained zero seconds above 105% FTP.",
+    "trust_platform_labels": false,
+    "moderate_band_pct_ftp": [0.76, 1.05],
+    "classes": {
+      "endurance_easy":        { "moderate_share_max": 0.12 },
+      "endurance_with_efforts":{ "moderate_share": [0.12, 0.30] },
+      "sweetspot_tempo":       { "moderate_share_min": 0.30 },
+      "threshold":             { "moderate_share_min": 0.30, "contiguous_s_at_94_105": 300 },
+      "threshold_plus":        { "s_above_105_pct_min": 120 },
+      "vo2max_supra":          { "s_above_105_pct_min": 300, "best_5min_pct_ftp_min": 1.06 }
+    }
+  },
+
+  "power_curve_provenance": {
+    "note": "v0.2 fix, and the most important one. v0.1 permitted a submaximal within-ride best to drive a limiter diagnosis, yielding a confidently wrong VO2max recommendation. Within-ride bests are floors, not measurements.",
+    "provenance_values": ["maximal_test", "race", "interval_session", "within_ride"],
+    "within_ride_is_lower_bound_only": true,
+    "diagnosis_requires": {
+      "provenance_in": ["maximal_test", "race"],
+      "max_age_weeks": 8,
+      "otherwise": "emit_insufficient_data_prescribe_5min_max_test"
+    },
+    "anchor_cross_check": {
+      "metric": "best_20min_power * 0.95",
+      "tolerance_pct_of_stated_ftp": 0.05,
+      "on_fail": "flag_anchor_before_prescribing_percentages"
+    },
+    "target_sanity_check": {
+      "rule": "reject_prescription_at_or_above_best_5min_power_for_reps_over_90s",
+      "on_fail": "flag_undoable_or_bad_anchor_do_not_serve"
+    }
+  },
+
+  "volume_adherence": {
+    "note": "v0.2 addition. Absent from v0.1 and the actual limiter in the validation case: 3.74 h/wk completed against 9 h stated available, four consecutive weeks. Evaluate BEFORE structure. No interval-selection change competes with a 2x volume gap.",
+    "evaluate_before_structure": true,
+    "rolling_window_weeks": 4,
+    "completed_vs_planned_min": 0.80,
+    "completed_vs_stated_available_min": 0.70,
+    "sustained_below": { "threshold": 0.60, "action": "stop_optimising_plan_surface_conversation" }
+  },
+
+  "gray_zone_detection": {
+    "basis": "pedalling_time",
+    "moderate_time_share_max": 0.35,
+    "check_per_segment": true,
+    "vo2_ceiling_flag": {
+      "metric": "best_5min_power_pct_of_ftp",
+      "threshold": 1.10,
+      "requires_provenance": ["maximal_test", "race"],
+      "note": "trained riders normally 1.15-1.25; below threshold means prescribe vo2, not more sweetspot. Do NOT fire on within_ride data."
+    },
+    "easy_ride_drift_flag": { "metric": "normalized_power_pct_of_ftp_on_endurance_rides", "threshold": 0.80 },
+    "threshold_calibration_status": "conventions_not_findings_tested_on_n_of_1"
+  },
+
+  "readiness_rules": {
+    "signals": {
+      "resting_hr_delta_bpm":      { "green": [null, 3],    "amber": [4, 7],      "red": [8, null] },
+      "hrv_pct_below_baseline":    { "green": [null, 0],    "amber": [0.05, 0.10],"red": [0.10, null] },
+      "sleep_hours_last_night":    { "green": [7, null],    "amber": [5.5, 7],    "red": [null, 5.5] },
+      "resp_rate_delta":           { "green": [null, 1],    "amber": [1, 2],      "red": [2, null] },
+      "subjective_1_10":           { "green": [7, null],    "amber": [4, 6],      "red": [null, 3] }
+    },
+    "aggregation": "worst_signal_wins",
+    "trend_window_days": 7,
+    "baseline_window_days": 30,
+    "actions": {
+      "green": "prescribe_as_planned",
+      "amber": "reduce_volume_30pct_or_substitute_endurance_z2",
+      "red":   "substitute_recovery_spin_or_rest"
+    },
+    "escalations": {
+      "two_consecutive_red": "insert_recovery_week",
+      "resp_rate_red_and_rhr_red": "illness_protocol_no_training",
+      "hrv_declining_14_days": "insert_recovery_week"
+    },
+    "never": ["substitute_a_harder_session_on_amber_or_red", "decide_on_single_reading"]
+  },
+
+  "hard_limits": {
+    "note": "Validate ALL generated plans against these AFTER generation. The LLM is not trusted to respect them.",
+    "max_sessions_per_week": 7,
+    "max_hard_sessions_per_week": 3,
+    "max_consecutive_hard_days": 2,
+    "max_weekly_load_ramp_pct": 0.08,
+    "recovery_week_every_n_weeks": 4,
+    "require_ftp_anchor_for_intensity": true,
+    "ftp_anchor_max_age_weeks": 8,
+    "ftp_retest_interval_weeks": [4, 6],
+    "forbid": ["weight_loss_prescription", "wkg_target_setting", "intensity_without_anchor"]
+  },
+
+  "expected_ftp_progression": {
+    "source": "Almquist 2022 (Front Physiol 13:837634); Ronnestad 2015 (SJMSS 25(2):143-151)",
+    "population": "trained cyclists ~3.3-3.4 W/kg, 7.5-8 h/week",
+    "weeks_4":  { "median_pct": 0.00, "note": "adaptation lags; set expectation explicitly" },
+    "weeks_8":  { "median_pct": 0.04, "range": [0.03, 0.05] },
+    "weeks_12": { "median_pct": 0.08, "sd": 0.09 },
+    "weeks_24": { "median_pct": 0.11, "range": [0.10, 0.12] },
+    "presentation_rule": "always_show_range_never_point_estimate"
+  },
+
+  "fuelling": {
+    "carbs_g_per_hour": {
+      "hard_or_long": [60, 90],
+      "sub_threshold_under_90min": [30, 60],
+      "note": "above 60 g/h requires ~2:1 glucose:fructose (Jeukendrup, Sports Med 2014)"
+    },
+    "protein_g_per_kg_day": 1.8,
+    "post_session_protein_g_per_kg": [0.4, 0.5]
+  }
+}
