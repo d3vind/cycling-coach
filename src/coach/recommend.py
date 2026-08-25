@@ -94,6 +94,15 @@ def recommend(audit_result, readiness, rider, goal="raise_ftp", registry=None):
         }
         return rec
 
+    # ftp_anchor_unverified is info-level by design: an unconfirmed anchor is
+    # a note on the session, never a reason to prescribe a test on its own
+    # (v0.2 3.3 -- within-ride bests cannot assert the anchor is wrong).
+    if "ftp_anchor_unverified" in flag_ids:
+        rec["warnings"].append(
+            "FTP anchor is unconfirmed in this window (no maximal 20-min "
+            "effort). Percent targets below assume it is right; a formal test "
+            "would firm it up.")
+
     prefer = {
         "vo2max": ["vo2_short_short_30_15", "vo2_short_short_40_20", "vo2_long_intervals"],
         "threshold": ["threshold_2x20", "over_unders"],

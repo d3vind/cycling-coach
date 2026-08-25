@@ -118,7 +118,8 @@ def main():
     print(f"  best 5-min {pc['best_5min_w']:.0f} W ({pc['best_5min_pct_ftp']:.0%} FTP)"
           f"  [{pc['best_5min_provenance']}]")
     print(f"  best 20-min {pc['best_20min_w']:.0f} W -> implies FTP "
-          f"{pc['implied_ftp_from_20min']:.0f} W ({pc['anchor_error_pct']:+.0%})")
+          f"{pc['implied_ftp_from_20min']:.0f} W ({pc['anchor_error_pct']:+.0%})"
+          f"  [{pc['best_20min_provenance']}]")
 
     if a["flags"]:
         print("\nFLAGS")

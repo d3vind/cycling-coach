@@ -277,9 +277,16 @@
       "otherwise": "emit_insufficient_data_prescribe_5min_max_test"
     },
     "anchor_cross_check": {
+      "note": "Section 3.3 applies here too. A within-ride 20-min best is a floor: it can leave the anchor unconfirmed, never assert it is wrong.",
       "metric": "best_20min_power * 0.95",
       "tolerance_pct_of_stated_ftp": 0.05,
-      "on_fail": "flag_anchor_before_prescribing_percentages"
+      "requires_provenance": ["maximal_test", "race"],
+      "on_fail": "flag_anchor_before_prescribing_percentages",
+      "within_ride_below_tolerance": {
+        "flag": "ftp_anchor_unverified",
+        "severity": "info",
+        "drives_recommendation": false
+      }
     },
     "target_sanity_check": {
       "rule": "reject_prescription_at_or_above_best_5min_power_for_reps_over_90s",

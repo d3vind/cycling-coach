@@ -86,6 +86,8 @@ def audit(window, ftp, stated_weekly_hours=None, planned_weekly_hours=None):
         "best_5min_provenance": best5["provenance"],
         "best_20min_w": best20["best_20min"],
         "best_20min_pct_ftp": best20["best_20min"] / ftp,
+        "best_20min_source": best20["name"],
+        "best_20min_provenance": best20["provenance"],
         "ceiling_gap_w": best5["best_5min"] - best20["best_20min"],
         "has_qualifying_maximal_data": bool(qualifying),
     }
@@ -126,11 +128,24 @@ def audit(window, ftp, stated_weekly_hours=None, planned_weekly_hours=None):
                           "test before diagnosing the ceiling.",
             })
 
-    if abs(power_curve["anchor_error_pct"]) > 0.05:
+    # v0.2 3.3 applies to the anchor cross-check too: a within-ride 20-min
+    # best is a floor, so it can leave the anchor unconfirmed but never
+    # assert it is wrong. Only a maximal effort can do that.
+    if best20["provenance"] in ("maximal_test", "race"):
+        if abs(power_curve["anchor_error_pct"]) > 0.05:
+            flags.append({
+                "id": "ftp_anchor_suspect", "severity": "warn",
+                "detail": f"20-min x 0.95 implies {implied:.0f} W vs stated {ftp} W "
+                          f"({power_curve['anchor_error_pct']:+.1%})",
+            })
+    elif power_curve["anchor_error_pct"] < -0.05:
         flags.append({
-            "id": "ftp_anchor_suspect", "severity": "warn",
-            "detail": f"20-min x 0.95 implies {implied:.0f} W vs stated {ftp} W "
-                      f"({power_curve['anchor_error_pct']:+.1%})",
+            "id": "ftp_anchor_unverified", "severity": "info",
+            "detail": f"best 20-min in the window is within-ride (a floor): "
+                      f"x 0.95 implies {implied:.0f} W vs stated {ftp} W "
+                      f"({power_curve['anchor_error_pct']:+.1%}). Not evidence "
+                      f"the anchor is wrong -- it just has not been confirmed "
+                      f"by a maximal effort.",
         })
 
     drift = []
